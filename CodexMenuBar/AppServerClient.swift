@@ -81,12 +81,12 @@ actor AppServerClient {
 
     func readAccount() async throws -> AccountReadResponse {
         let data = try await request(method: "account/read", params: ["refreshToken": false])
-        return try JSONDecoder().decode(AccountReadResponse.self, from: data)
+        return try AppServerResponseDecoder.decode(AccountReadResponse.self, from: data)
     }
 
     func readRateLimits() async throws -> RateLimitsReadResult {
         let data = try await request(method: "account/rateLimits/read", params: nil)
-        return try JSONDecoder().decode(RateLimitsReadResult.self, from: data)
+        return try AppServerResponseDecoder.decode(RateLimitsReadResult.self, from: data)
     }
 
     func shutdown() {
@@ -214,4 +214,14 @@ struct AccountReadResponse: Decodable, Sendable {
 
 struct AccountInfo: Decodable, Sendable {
     let type: String
+}
+
+enum AppServerResponseDecoder {
+    static func decode<Result: Decodable>(_ type: Result.Type, from data: Data) throws -> Result {
+        try JSONDecoder().decode(ResponseEnvelope<Result>.self, from: data).result
+    }
+
+    private struct ResponseEnvelope<Result: Decodable>: Decodable {
+        let result: Result
+    }
 }

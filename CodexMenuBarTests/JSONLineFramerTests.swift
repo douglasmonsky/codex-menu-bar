@@ -2,6 +2,14 @@ import XCTest
 @testable import CodexMenuBar
 
 final class JSONLineFramerTests: XCTestCase {
+    func testDecodesResultFromProtocolEnvelope() throws {
+        let data = Data(#"{"id":1,"result":{"account":{"type":"chatgpt"},"requiresOpenaiAuth":true}}"#.utf8)
+        let response = try AppServerResponseDecoder.decode(AccountReadResponse.self, from: data)
+
+        XCTAssertEqual(response.account?.type, "chatgpt")
+        XCTAssertTrue(response.requiresOpenaiAuth)
+    }
+
     func testSplitAndCoalescedLines() throws {
         var framer = JSONLineFramer()
         XCTAssertEqual(try framer.append(Data("{\"a\":1}\n{\"b\":2}\n".utf8)), [Data("{\"a\":1}".utf8), Data("{\"b\":2}".utf8)])
