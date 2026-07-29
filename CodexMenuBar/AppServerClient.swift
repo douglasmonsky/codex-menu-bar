@@ -136,18 +136,15 @@ actor AppServerClient {
     }
 
     private func startReader(_ handle: FileHandle, isError: Bool) {
-        Task { [weak self] in
-            do {
-                while !Task.isCancelled {
-                    guard let data = try handle.read(upToCount: 4096), !data.isEmpty else {
-                        if !isError { await self?.transportFailed("stdout closed") }
-                        return
-                    }
-                    if isError { continue }
-                    await self?.receive(data)
+        Task.detached { [weak self] in
+            while !Task.isCancelled {
+                let data = handle.availableData
+                guard !data.isEmpty else {
+                    if !isError { await self?.transportFailed("stdout closed") }
+                    return
                 }
-            } catch {
-                if !isError { await self?.transportFailed("stdout read failed") }
+                if isError { continue }
+                await self?.receive(data)
             }
         }
     }
