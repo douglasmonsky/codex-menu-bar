@@ -10,6 +10,25 @@ enum ConnectionState: Equatable, Sendable {
     case notAuthenticated
 }
 
+enum MenuBarTextFormatter {
+    static func text(for snapshot: UsageSnapshot, now: Date = Date()) -> String {
+        snapshot.windows.map { window in
+            let percent = "\(Int(window.remainingPercent.rounded()))%"
+            guard window.compactLabel == "W" else {
+                return "\(window.compactLabel) \(percent)"
+            }
+            guard let resetsAt = window.resetsAt else { return percent }
+            return "\(percent) · \(countdown(until: resetsAt, from: now))"
+        }
+        .joined(separator: " · ")
+    }
+
+    private static func countdown(until reset: Date, from now: Date) -> String {
+        let remainingHours = max(0, Int(ceil(reset.timeIntervalSince(now) / 3_600)))
+        return "\(remainingHours / 24)d \(remainingHours % 24)h"
+    }
+}
+
 @MainActor
 final class AppModel: ObservableObject {
     @Published private(set) var snapshot: UsageSnapshot?
@@ -39,8 +58,8 @@ final class AppModel: ObservableObject {
             default: return "Codex ?"
             }
         }
-        let values = snapshot.windows.map { "\($0.compactLabel) \(Int($0.remainingPercent.rounded()))%" }
-        return values.joined(separator: " · ") + (connectionState == .connected ? "" : " !")
+        return MenuBarTextFormatter.text(for: snapshot)
+            + (connectionState == .connected ? "" : " !")
     }
 
     var statusText: String {

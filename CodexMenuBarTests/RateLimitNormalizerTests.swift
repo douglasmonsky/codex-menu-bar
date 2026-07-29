@@ -27,6 +27,33 @@ final class RateLimitNormalizerTests: XCTestCase {
         XCTAssertEqual(RateLimitNormalizer.normalize(raw)?.windows.map(\.id), ["primary", "secondary"])
     }
 
+    func testMenuBarTextReplacesWeeklyLabelWithResetCountdown() throws {
+        let now = Date(timeIntervalSince1970: 1_000)
+        let weeklyReset = now.addingTimeInterval((3 * 24 + 5) * 3_600)
+        let raw = result(map: ["codex": bucket(
+            primary: window(used: 32, duration: 300),
+            secondary: window(used: 57, duration: 10_080, resetsAt: weeklyReset.timeIntervalSince1970)
+        )])
+        let snapshot = try XCTUnwrap(RateLimitNormalizer.normalize(raw, fetchedAt: now))
+
+        XCTAssertEqual(
+            MenuBarTextFormatter.text(for: snapshot, now: now),
+            "5h 68% · 43% · 3d 5h"
+        )
+    }
+
+    func testMenuBarCountdownRoundsUpPartialHours() throws {
+        let now = Date(timeIntervalSince1970: 1_000)
+        let raw = result(map: ["codex": bucket(primary: window(
+            used: 57,
+            duration: 10_080,
+            resetsAt: now.addingTimeInterval(60).timeIntervalSince1970
+        ))])
+        let snapshot = try XCTUnwrap(RateLimitNormalizer.normalize(raw, fetchedAt: now))
+
+        XCTAssertEqual(MenuBarTextFormatter.text(for: snapshot, now: now), "43% · 0d 1h")
+    }
+
     private func result(map: [String: RawRateLimitBucket]?, top: RawRateLimitBucket? = nil) -> RateLimitsReadResult {
         RateLimitsReadResult(rateLimits: top, rateLimitsByLimitId: map)
     }
@@ -35,7 +62,7 @@ final class RateLimitNormalizerTests: XCTestCase {
         RawRateLimitBucket(limitId: "codex", limitName: nil, primary: primary, secondary: secondary, rateLimitReachedType: nil)
     }
 
-    private func window(used: Double, duration: Int?) -> RawRateLimitWindow {
-        RawRateLimitWindow(usedPercent: used, windowDurationMins: duration, resetsAt: nil)
+    private func window(used: Double, duration: Int?, resetsAt: Double? = nil) -> RawRateLimitWindow {
+        RawRateLimitWindow(usedPercent: used, windowDurationMins: duration, resetsAt: resetsAt)
     }
 }
