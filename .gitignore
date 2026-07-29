@@ -1,0 +1,18 @@
+# Xcode
+.DS_Store
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xccheckout
+*.moved-aside
+
+# Swift Package Manager
+.build/
+Package.resolved
+
+# Local protocol inspection output
+.tmp/
+
+# Serena is a local assistant integration artifact.
+.serena/
