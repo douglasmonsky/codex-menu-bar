@@ -8,10 +8,23 @@ struct ScriptableExportPayload: Codable, Equatable, Sendable {
         let compactLabel: String
     }
 
+    struct Tasks: Codable, Equatable, Sendable {
+        struct Item: Codable, Equatable, Sendable {
+            let title: String
+            let date: Date
+        }
+
+        let runningCount: Int
+        let finishedCount: Int
+        let running: [Item]
+        let finished: [Item]
+    }
+
     let updatedAt: Date
     let windows: [Window]
+    let tasks: Tasks
 
-    init(snapshot: UsageSnapshot) {
+    init(snapshot: UsageSnapshot, taskActivity: TaskActivitySnapshot) {
         updatedAt = snapshot.fetchedAt
         windows = snapshot.windows.map {
             Window(
@@ -21,6 +34,19 @@ struct ScriptableExportPayload: Codable, Equatable, Sendable {
                 compactLabel: $0.compactLabel
             )
         }
+        let running = Array(taskActivity.running.prefix(4))
+        let remainingSlots = 4 - running.count
+        let finished = Array(taskActivity.finished.prefix(remainingSlots))
+        tasks = Tasks(
+            runningCount: taskActivity.running.count,
+            finishedCount: taskActivity.finished.count,
+            running: running.map {
+                Tasks.Item(title: $0.title, date: $0.date)
+            },
+            finished: finished.map {
+                Tasks.Item(title: $0.title, date: $0.date)
+            }
+        )
     }
 }
 
@@ -45,7 +71,10 @@ actor ScriptableExporter {
         self.scriptSourceURL = scriptSourceURL
     }
 
-    func export(_ snapshot: UsageSnapshot) -> Status {
+    func export(
+        _ snapshot: UsageSnapshot,
+        taskActivity: TaskActivitySnapshot = .empty
+    ) -> Status {
         let container = homeDirectory
             .appendingPathComponent("Library/Mobile Documents/iCloud~dk~simonbs~Scriptable")
         var isDirectory = ObjCBool(false)
@@ -61,7 +90,9 @@ actor ScriptableExporter {
             let encoder = JSONEncoder()
             encoder.dateEncodingStrategy = .iso8601
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-            let data = try encoder.encode(ScriptableExportPayload(snapshot: snapshot))
+            let data = try encoder.encode(
+                ScriptableExportPayload(snapshot: snapshot, taskActivity: taskActivity)
+            )
             try data.write(
                 to: documents.appendingPathComponent("codex-usage.json"),
                 options: .atomic
@@ -70,13 +101,18 @@ actor ScriptableExporter {
             if let scriptSourceURL {
                 let destination = documents.appendingPathComponent("Codex Usage.js")
                 let sourceData = try Data(contentsOf: scriptSourceURL)
-                if let existingData = try? Data(contentsOf: destination),
-                   existingData != sourceData,
-                   !existingData.starts(with: Data(Self.ownershipMarker.utf8)) {
-                    return .scriptNameConflict
+                let existingData = try? Data(contentsOf: destination)
+                var destinationData = sourceData
+                if let existingData, existingData != sourceData {
+                    let marker = Data(Self.ownershipMarker.utf8)
+                    guard let markerRange = existingData.range(of: marker),
+                          markerRange.lowerBound < 512 else {
+                        return .scriptNameConflict
+                    }
+                    destinationData = existingData[..<markerRange.lowerBound] + sourceData
                 }
-                if (try? Data(contentsOf: destination)) != sourceData {
-                    try sourceData.write(to: destination, options: .atomic)
+                if existingData != destinationData {
+                    try destinationData.write(to: destination, options: .atomic)
                 }
             }
             return .exported

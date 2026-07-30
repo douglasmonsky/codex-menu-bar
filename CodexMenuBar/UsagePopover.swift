@@ -27,6 +27,13 @@ struct UsagePopover: View {
                 Text("Last updated \(snapshot.fetchedAt.formatted(.relative(presentation: .named)))")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                Divider()
+                Text(
+                    "\(model.taskActivity.running.count) running · "
+                    + "\(model.taskActivity.finished.count) finished in the last 2h"
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
             } else if model.connectionState == .notAuthenticated {
                 Text("Codex is not signed in for ChatGPT usage.\nSign in with the Codex CLI, then choose Retry.")
                     .font(.callout)

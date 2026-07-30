@@ -52,6 +52,30 @@ if (!fileManager.fileExists(dataPath)) {
     usage.textColor = Color.white()
     usage.minimumScaleFactor = 0.7
 
+    widget.addSpacer(7)
+
+    const tasks = payload.tasks || { running: [], finished: [] }
+    const running = Array.isArray(tasks.running) ? tasks.running : []
+    const finished = Array.isArray(tasks.finished) ? tasks.finished : []
+    const runningCount = Number.isInteger(tasks.runningCount) ? tasks.runningCount : running.length
+    const finishedCount = Number.isInteger(tasks.finishedCount) ? tasks.finishedCount : finished.length
+    const summary = widget.addText(`● ${runningCount} running   ✓ ${finishedCount} finished`)
+    summary.font = Font.semiboldSystemFont(11)
+    summary.textColor = new Color("#AAB4BC")
+
+    const rows = [
+      ...running.map(task => ({ prefix: "●", color: "#67D391", ...task })),
+      ...finished.map(task => ({ prefix: "✓", color: "#8E9AA3", ...task }))
+    ]
+    const maximumRows = config.widgetFamily === "small" ? 1 : 4
+    for (const task of rows.slice(0, maximumRows)) {
+      const row = widget.addText(`${task.prefix} ${task.title}`)
+      row.font = Font.systemFont(10)
+      row.textColor = new Color(task.color)
+      row.lineLimit = 1
+      row.minimumScaleFactor = 0.75
+    }
+
     widget.addSpacer()
 
     const updated = new Date(payload.updatedAt)

@@ -89,6 +89,19 @@ actor AppServerClient {
         return try AppServerResponseDecoder.decode(RateLimitsReadResult.self, from: data)
     }
 
+    func readRecentThreads() async throws -> [CodexThreadSummary] {
+        let data = try await request(
+            method: "thread/list",
+            params: [
+                "limit": 100,
+                "sortKey": "updated_at",
+                "sortDirection": "desc",
+                "useStateDbOnly": true
+            ]
+        )
+        return try AppServerResponseDecoder.decode(ThreadListResponse.self, from: data).data
+    }
+
     func shutdown() {
         notificationContinuation?.finish()
         eventContinuation?.yield(.stopped)
@@ -211,6 +224,10 @@ struct AccountReadResponse: Decodable, Sendable {
 
 struct AccountInfo: Decodable, Sendable {
     let type: String
+}
+
+private struct ThreadListResponse: Decodable, Sendable {
+    let data: [CodexThreadSummary]
 }
 
 enum AppServerResponseDecoder {

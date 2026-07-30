@@ -32,9 +32,11 @@ store history, open a listener, or install/update Codex.
 
 ## iPhone widget without an Apple Developer account
 
-The Mac app can export its aggregate usage snapshot to the Scriptable iCloud
-container. It writes only percentages, window durations, reset timestamps, and
-the last-updated time. It does not export credentials or conversation data.
+The Mac app can export its usage snapshot and recent task activity to the
+Scriptable iCloud container. It writes percentages, window durations, reset
+timestamps, the last-updated time, and the titles of active tasks or tasks
+finished in the last two hours. It does not export credentials or conversation
+contents.
 
 Setup:
 

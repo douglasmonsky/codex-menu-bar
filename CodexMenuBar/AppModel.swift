@@ -36,19 +36,23 @@ final class AppModel: ObservableObject {
     @Published private(set) var isRefreshing = false
     @Published private(set) var lastError: String?
     @Published private(set) var widgetSyncText = "iPhone widget: waiting for Scriptable iCloud"
+    @Published private(set) var taskActivity = TaskActivitySnapshot.empty
 
     private var lifecycleTask: Task<Void, Never>?
     private var notificationTask: Task<Void, Never>?
     private var client: AppServerClient?
     private let defaults: UserDefaults
     private let scriptableExporter: ScriptableExporter
+    private let taskActivityScanner: TaskActivityScanner
 
     init(
         defaults: UserDefaults = .standard,
-        scriptableExporter: ScriptableExporter = ScriptableExporter()
+        scriptableExporter: ScriptableExporter = ScriptableExporter(),
+        taskActivityScanner: TaskActivityScanner = TaskActivityScanner()
     ) {
         self.defaults = defaults
         self.scriptableExporter = scriptableExporter
+        self.taskActivityScanner = taskActivityScanner
         start()
     }
 
@@ -201,7 +205,15 @@ final class AppModel: ObservableObject {
                 return
             }
             snapshot = normalized
-            updateWidgetSyncStatus(await scriptableExporter.export(normalized))
+            do {
+                let threads = try await client.readRecentThreads()
+                taskActivity = await taskActivityScanner.scan(threads: threads)
+            } catch {
+                taskActivity = .empty
+            }
+            updateWidgetSyncStatus(
+                await scriptableExporter.export(normalized, taskActivity: taskActivity)
+            )
             connectionState = .connected
             lastError = nil
         } catch AppServerError.notAuthenticated {
