@@ -14,6 +14,8 @@
 		A00000000000000000000005 /* UsagePopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000015 /* UsagePopover.swift */; };
 		A00000000000000000000007 /* JSONLineFramerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000021 /* JSONLineFramerTests.swift */; };
 		A00000000000000000000008 /* RateLimitNormalizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000022 /* RateLimitNormalizerTests.swift */; };
+		B00000000000000000000001 /* ScriptableExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000011 /* ScriptableExporter.swift */; };
+		B00000000000000000000002 /* Codex Usage.js in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000012 /* Codex Usage.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +39,8 @@
 		A00000000000000000000020 /* CodexMenuBarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodexMenuBarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A00000000000000000000021 /* JSONLineFramerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONLineFramerTests.swift; sourceTree = "<group>"; };
 		A00000000000000000000022 /* RateLimitNormalizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RateLimitNormalizerTests.swift; sourceTree = "<group>"; };
+		B00000000000000000000011 /* ScriptableExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptableExporter.swift; sourceTree = "<group>"; };
+		B00000000000000000000012 /* Codex Usage.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "Scriptable/Codex Usage.js"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,7 +50,7 @@
 
 /* Begin PBXGroup section */
 		A00000000000000000000070 = {isa = PBXGroup; children = (A00000000000000000000071 /* CodexMenuBar */, A00000000000000000000072 /* CodexMenuBarTests */, A00000000000000000000073 /* Products */); sourceTree = "<group>"; };
-		A00000000000000000000071 /* CodexMenuBar */ = {isa = PBXGroup; children = (A00000000000000000000011, A00000000000000000000012, A00000000000000000000013, A00000000000000000000014, A00000000000000000000015, A00000000000000000000016); path = CodexMenuBar; sourceTree = "<group>"; };
+		A00000000000000000000071 /* CodexMenuBar */ = {isa = PBXGroup; children = (A00000000000000000000011, A00000000000000000000012, A00000000000000000000013, A00000000000000000000014, A00000000000000000000015, B00000000000000000000011, B00000000000000000000012, A00000000000000000000016); path = CodexMenuBar; sourceTree = "<group>"; };
 		A00000000000000000000072 /* CodexMenuBarTests */ = {isa = PBXGroup; children = (A00000000000000000000021, A00000000000000000000022); path = CodexMenuBarTests; sourceTree = "<group>"; };
 		A00000000000000000000073 /* Products */ = {isa = PBXGroup; children = (A00000000000000000000010, A00000000000000000000020); name = Products; sourceTree = "<group>"; };
 /* End PBXGroup section */
@@ -61,7 +65,7 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A00000000000000000000062 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		A00000000000000000000062 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (B00000000000000000000002); runOnlyForDeploymentPostprocessing = 0; };
 		A00000000000000000000065 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
@@ -70,7 +74,7 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A00000000000000000000061 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000001, A00000000000000000000002, A00000000000000000000003, A00000000000000000000004, A00000000000000000000005); runOnlyForDeploymentPostprocessing = 0; };
+		A00000000000000000000061 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000001, A00000000000000000000002, A00000000000000000000003, A00000000000000000000004, A00000000000000000000005, B00000000000000000000001); runOnlyForDeploymentPostprocessing = 0; };
 		A00000000000000000000064 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000007, A00000000000000000000008); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 

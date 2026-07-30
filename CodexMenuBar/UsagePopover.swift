@@ -34,6 +34,9 @@ struct UsagePopover: View {
                 Text(model.statusText)
                     .foregroundStyle(.secondary)
             }
+            Text(model.widgetSyncText)
+                .font(.caption)
+                .foregroundStyle(.secondary)
             if let error = model.lastError {
                 Text(error)
                     .font(.caption)

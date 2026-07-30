@@ -29,3 +29,22 @@ Run tests with the `CodexMenuBarTests` scheme using the same destination and
 
 The app is intentionally small: it does not send prompts, inspect sessions,
 store history, open a listener, or install/update Codex.
+
+## iPhone widget without an Apple Developer account
+
+The Mac app can export its aggregate usage snapshot to the Scriptable iCloud
+container. It writes only percentages, window durations, reset timestamps, and
+the last-updated time. It does not export credentials or conversation data.
+
+Setup:
+
+1. Install Scriptable from the App Store on the iPhone.
+2. In Scriptable settings, enable iCloud.
+3. Enable iCloud Drive for Scriptable on the Mac and iPhone.
+4. Launch or refresh Codex Menu Bar on the Mac.
+5. In the iPhone Home Screen widget picker, add Scriptable.
+6. Edit the widget and choose the `Codex Usage` script.
+
+The Mac app copies `Codex Usage.js` and `codex-usage.json` into Scriptable's
+iCloud documents folder when that container becomes available. Widget refresh
+timing is ultimately controlled by iOS.

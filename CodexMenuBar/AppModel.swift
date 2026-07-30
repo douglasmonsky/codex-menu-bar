@@ -35,14 +35,20 @@ final class AppModel: ObservableObject {
     @Published private(set) var connectionState: ConnectionState = .starting
     @Published private(set) var isRefreshing = false
     @Published private(set) var lastError: String?
+    @Published private(set) var widgetSyncText = "iPhone widget: waiting for Scriptable iCloud"
 
     private var lifecycleTask: Task<Void, Never>?
     private var notificationTask: Task<Void, Never>?
     private var client: AppServerClient?
     private let defaults: UserDefaults
+    private let scriptableExporter: ScriptableExporter
 
-    init(defaults: UserDefaults = .standard) {
+    init(
+        defaults: UserDefaults = .standard,
+        scriptableExporter: ScriptableExporter = ScriptableExporter()
+    ) {
         self.defaults = defaults
+        self.scriptableExporter = scriptableExporter
         start()
     }
 
@@ -195,6 +201,7 @@ final class AppModel: ObservableObject {
                 return
             }
             snapshot = normalized
+            updateWidgetSyncStatus(await scriptableExporter.export(normalized))
             connectionState = .connected
             lastError = nil
         } catch AppServerError.notAuthenticated {
@@ -211,6 +218,19 @@ final class AppModel: ObservableObject {
             try? await Task.sleep(nanoseconds: 500_000_000)
         }
         await refresh()
+    }
+
+    private func updateWidgetSyncStatus(_ status: ScriptableExporter.Status) {
+        switch status {
+        case .exported:
+            widgetSyncText = "iPhone widget: synced through Scriptable iCloud"
+        case .waitingForICloud:
+            widgetSyncText = "iPhone widget: install Scriptable and enable iCloud"
+        case .scriptNameConflict:
+            widgetSyncText = "iPhone widget: rename the existing Codex Usage script"
+        case .failed:
+            widgetSyncText = "iPhone widget: sync failed"
+        }
     }
 
     private func resolveExecutable() -> URL? {
